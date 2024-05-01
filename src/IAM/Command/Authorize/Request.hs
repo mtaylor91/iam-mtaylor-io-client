@@ -26,6 +26,7 @@ data AuthorizeRequestCommand = AuthorizeRequestCommand
   , authorizeHost :: !Text
   , authorizeMethod :: !Text
   , authorizeResource :: !Text
+  , authorizeToken :: !(Maybe Text)
   } deriving (Show)
 
 
@@ -50,6 +51,7 @@ authorizeRequest cmd = do
         , authorizationRequestAction = reqAction
         , authorizationRequestResource = authorizeResource cmd
         , authorizationRequestHost = authorizeHost cmd
+        , authorizationRequestToken = authorizeToken cmd
         }
 
   let authorizeClient = IAM.Client.authorizeClient req
@@ -79,3 +81,9 @@ authorizeRequestCommand = AuthorizeRequestCommand
       ( metavar "RESOURCE"
      <> help "Resource to authorize"
       )
+  <*> optional (strOption
+      ( long "token"
+      <> short 't'
+      <> metavar "TOKEN"
+      <> help "Token to use for authorization"
+      ))
