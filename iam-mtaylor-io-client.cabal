@@ -1,0 +1,141 @@
+cabal-version: 2.2
+
+-- This file has been generated from package.yaml by hpack version 0.36.0.
+--
+-- see: https://github.com/sol/hpack
+
+name:           iam-mtaylor-io-client
+version:        0.1.0.0
+description:    Please see the README on GitHub at <https://github.com/mtaylor91/iam-mtaylor-io-client#readme>
+homepage:       https://github.com/mtaylor91/iam-mtaylor-io-client#readme
+bug-reports:    https://github.com/mtaylor91/iam-mtaylor-io-client/issues
+author:         Mike Taylor
+maintainer:     mike.charles.taylor@gmail.com
+copyright:      Copyright (c) 2024
+license:        BSD-3-Clause
+license-file:   LICENSE
+build-type:     Simple
+extra-source-files:
+    README.md
+    CHANGELOG.md
+
+source-repository head
+  type: git
+  location: https://github.com/mtaylor91/iam-mtaylor-io-client
+
+library
+  exposed-modules:
+      IAM.Client
+      IAM.Client.Auth
+      IAM.Client.Util
+      IAM.Command
+      IAM.Command.Authorize
+      IAM.Command.Authorize.Login
+      IAM.Command.Authorize.Request
+      IAM.Command.Create
+      IAM.Command.Create.Group
+      IAM.Command.Create.Policy
+      IAM.Command.Create.User
+      IAM.Command.Delete
+      IAM.Command.Delete.Group
+      IAM.Command.Delete.Policy
+      IAM.Command.Delete.Session
+      IAM.Command.Delete.User
+      IAM.Command.Get
+      IAM.Command.Get.Group
+      IAM.Command.Get.Policy
+      IAM.Command.Get.User
+      IAM.Command.Keypair
+      IAM.Command.List
+      IAM.Command.List.Groups
+      IAM.Command.List.Logins
+      IAM.Command.List.Policies
+      IAM.Command.List.Sessions
+      IAM.Command.List.Users
+      IAM.Command.Login
+      IAM.Command.Logout
+      IAM.Config
+  other-modules:
+      Paths_iam_mtaylor_io_client
+  autogen-modules:
+      Paths_iam_mtaylor_io_client
+  hs-source-dirs:
+      src
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , base64
+    , bytestring
+    , case-insensitive
+    , ed25519
+    , email-validate
+    , http-client
+    , http-client-tls
+    , http-types
+    , iam-mtaylor-io-core
+    , optparse-applicative
+    , servant-client
+    , servant-server
+    , text
+    , uuid
+  default-language: Haskell2010
+
+executable iam-mtaylor-io-client
+  main-is: Main.hs
+  other-modules:
+      Paths_iam_mtaylor_io_client
+  autogen-modules:
+      Paths_iam_mtaylor_io_client
+  hs-source-dirs:
+      app
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , base64
+    , bytestring
+    , case-insensitive
+    , ed25519
+    , email-validate
+    , http-client
+    , http-client-tls
+    , http-types
+    , iam-mtaylor-io-client
+    , iam-mtaylor-io-core
+    , optparse-applicative
+    , servant-client
+    , servant-server
+    , text
+    , uuid
+  default-language: Haskell2010
+
+test-suite iam-mtaylor-io-client-test
+  type: exitcode-stdio-1.0
+  main-is: Spec.hs
+  other-modules:
+      Paths_iam_mtaylor_io_client
+  autogen-modules:
+      Paths_iam_mtaylor_io_client
+  hs-source-dirs:
+      test
+  ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
+  build-depends:
+      aeson
+    , base >=4.7 && <5
+    , base64
+    , bytestring
+    , case-insensitive
+    , ed25519
+    , email-validate
+    , http-client
+    , http-client-tls
+    , http-types
+    , iam-mtaylor-io-client
+    , iam-mtaylor-io-core
+    , optparse-applicative
+    , servant-client
+    , servant-server
+    , text
+    , uuid
+  default-language: Haskell2010
