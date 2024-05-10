@@ -1,9 +1,11 @@
 module IAM.Client.Util
-  ( printClientError
+  ( clientErrorToError
+  , printClientError
   , handleClientError
   , serverUrl
   ) where
 
+import Data.Aeson
 import Data.ByteString.Lazy (toStrict)
 import Data.Text
 import Data.Text.Encoding
@@ -12,6 +14,15 @@ import Servant.Client
 import System.Exit
 
 import IAM.Config
+import IAM.Error
+
+
+clientErrorToError :: ClientError -> Either ClientError Error
+clientErrorToError e@(FailureResponse _ response) =
+  case decode $ responseBody response of
+    Just err -> Right err
+    Nothing -> Left e
+clientErrorToError e = Left e
 
 
 handleClientError :: ClientError -> IO ()

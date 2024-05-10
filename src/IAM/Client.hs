@@ -22,8 +22,6 @@ module IAM.Client
   , listPolicies
   , createPolicy
   , mkPolicyClient
-  , createMembership
-  , deleteMembership
   , authorizeClient
   , UserClient(..)
   , LoginRequestsClient(..)
@@ -36,6 +34,7 @@ module IAM.Client
   , GroupClient(..)
   , GroupPolicyClient(..)
   , PolicyClient(..)
+  , MembershipClient(..)
   ) where
 
 import Data.Text
@@ -136,7 +135,8 @@ type GroupPolicyClientM =
 
 
 type GroupMembershipClientM
-  = ClientM Membership
+  = ClientM NoContent
+  :<|> ClientM Membership
   :<|> ClientM Membership
 
 
@@ -230,7 +230,8 @@ data GroupPolicyClient = GroupPolicyClient
 
 
 data MembershipClient = MembershipClient
-  { createMembership :: !(ClientM Membership)
+  { getMembership :: !(ClientM NoContent)
+  , createMembership :: !(ClientM Membership)
   , deleteMembership :: !(ClientM Membership)
   }
 
@@ -435,8 +436,9 @@ mkGroupClient gid =
   mkMembershipClient ::
     (UserIdentifier -> GroupMembershipClientM) -> UserIdentifier -> MembershipClient
   mkMembershipClient memberClient' uid =
-    let (createMembership' :<|> deleteMembership') = memberClient' uid
-    in MembershipClient createMembership' deleteMembership'
+    let (getMembership' :<|> createMembership' :<|> deleteMembership')
+          = memberClient' uid
+    in MembershipClient getMembership' createMembership' deleteMembership'
 
 
 listPolicies ::
