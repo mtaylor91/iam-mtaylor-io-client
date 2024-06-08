@@ -54,7 +54,6 @@ library
       IAM.Command.List.Users
       IAM.Command.Login
       IAM.Command.Logout
-      IAM.Config
   other-modules:
       Paths_iam_mtaylor_io_client
   autogen-modules:
