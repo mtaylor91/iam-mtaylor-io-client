@@ -54,8 +54,8 @@ deleteSessionByUserIdentifier uid sid = do
   mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
   let userClient = C.mkUserClient uid
   let sessionsClient = C.userSessionsClient userClient
-  let sessionClient' = C.sessionClient sessionsClient sid
-  let deleteSession' = C.deleteSession sessionClient'
+  let sessionClient' = C.userSessionClient sessionsClient sid
+  let deleteSession' = C.deleteUserSession sessionClient'
   r <- runClientM deleteSession' $ mkClientEnv mgr url
   case r of
     Left err -> handleClientError err

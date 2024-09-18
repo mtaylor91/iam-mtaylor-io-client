@@ -25,8 +25,8 @@ logout LogoutOptions = do
   auth <- clientAuthInfo
   mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
   let sessionsClient = mkCallerSessionsClient
-  let sessionClient' = sessionClient sessionsClient sid
-  let deleteSession' = deleteSession sessionClient'
+  let sessionClient' = userSessionClient sessionsClient sid
+  let deleteSession' = deleteUserSession sessionClient'
   r <- runClientM deleteSession' $ mkClientEnv mgr url
   case r of
     Left err -> handleClientError err

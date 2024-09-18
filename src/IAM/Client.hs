@@ -22,6 +22,8 @@ module IAM.Client
   , listPolicies
   , createPolicy
   , mkPolicyClient
+  , listSessions
+  , mkSessionClient
   , authorizeClient
   , UserClient(..)
   , LoginRequestsClient(..)
@@ -35,6 +37,7 @@ module IAM.Client
   , GroupPolicyClient(..)
   , PolicyClient(..)
   , MembershipClient(..)
+  , SessionClient(..)
   ) where
 
 import Data.Text
@@ -152,6 +155,16 @@ type PolicyClientM =
     :<|> ClientM Policy
 
 
+type SessionsClientM
+  = (Maybe Int -> Maybe Int -> ClientM (ListResponse Session))
+  :<|> (SessionId -> SessionClientM)
+
+
+type SessionClientM
+  = ClientM Session
+  :<|> ClientM Session
+
+
 type AuthorizationClientM
   = AuthorizationRequest -> ClientM AuthorizationResponse
 
@@ -203,14 +216,14 @@ data UserPolicyClient = UserPolicyClient
 
 data UserSessionsClient = UserSessionsClient
   { createSession :: !(ClientM CreateSession)
-  , listSessions :: !(Maybe Int -> Maybe Int -> ClientM (ListResponse Session))
-  , sessionClient :: !(SessionId -> UserSessionClient)
+  , listUserSessions :: !(Maybe Int -> Maybe Int -> ClientM (ListResponse Session))
+  , userSessionClient :: !(SessionId -> UserSessionClient)
   }
 
 
 data UserSessionClient = UserSessionClient
-  { getSession :: !(ClientM Session)
-  , deleteSession :: !(ClientM Session)
+  { getUserSession :: !(ClientM Session)
+  , deleteUserSession :: !(ClientM Session)
   , refreshSession :: !(ClientM Session)
   }
 
@@ -242,10 +255,17 @@ data PolicyClient = PolicyClient
   }
 
 
+data SessionClient = SessionClient
+  { getSession :: !(ClientM Session)
+  , deleteSession :: !(ClientM Session)
+  }
+
+
 callerClient :: UserClientM
 usersClient :: UsersClientM
 groupsClient :: GroupsClientM
 policiesClient :: PoliciesClientM
+sessionsClient :: SessionsClientM
 authorizeClient :: AuthorizationClientM
 login :: LoginRequest -> ClientM (LoginResponse CreateSession)
 
@@ -254,6 +274,7 @@ callerClient
   :<|> usersClient
   :<|> groupsClient
   :<|> policiesClient
+  :<|> sessionsClient
   :<|> authorizeClient
   :<|> login
   = client iamAPI
@@ -455,3 +476,16 @@ mkPolicyClient :: PolicyIdentifier -> PolicyClient
 mkPolicyClient pid =
   let (getPolicy' :<|> deletePolicy') = policyClient pid
   in PolicyClient getPolicy' deletePolicy'
+
+
+listSessions :: Maybe Int -> Maybe Int -> ClientM (ListResponse Session)
+sessionClient :: SessionId -> SessionClientM
+
+
+listSessions :<|> sessionClient = sessionsClient
+
+
+mkSessionClient :: SessionId -> SessionClient
+mkSessionClient sid =
+  let (getSession' :<|> deleteSession') = sessionClient sid
+  in SessionClient getSession' deleteSession'

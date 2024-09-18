@@ -39,7 +39,7 @@ listSessions opts = case listSessionsUser opts of
 listCallerSessions :: ListSessionsOptions -> IO ()
 listCallerSessions opts =
   let sessionsClient = IAM.Client.mkCallerSessionsClient
-      listClient = IAM.Client.listSessions sessionsClient
+      listClient = IAM.Client.listUserSessions sessionsClient
    in runWithClient listClient opts
 
 
@@ -63,7 +63,7 @@ listUserSessionsByIdentifier :: UserIdentifier -> ListSessionsOptions -> IO ()
 listUserSessionsByIdentifier userIdentifier opts =
   let userClient = IAM.Client.mkUserClient userIdentifier
       sessionsClient = IAM.Client.userSessionsClient userClient
-      listClient = IAM.Client.listSessions sessionsClient
+      listClient = IAM.Client.listUserSessions sessionsClient
    in runWithClient listClient opts
 
 
