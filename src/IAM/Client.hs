@@ -156,7 +156,8 @@ type PolicyClientM =
 
 
 type SessionsClientM
-  = (Maybe Int -> Maybe Int -> ClientM (ListResponse Session))
+  = (Maybe Text -> Maybe SortSessionsBy -> Maybe SortOrder -> Maybe Int -> Maybe Int ->
+      ClientM (ListResponse Session))
   :<|> (SessionId -> SessionClientM)
 
 
@@ -478,7 +479,7 @@ mkPolicyClient pid =
   in PolicyClient getPolicy' deletePolicy'
 
 
-listSessions :: Maybe Int -> Maybe Int -> ClientM (ListResponse Session)
+listSessions :: Maybe Text -> Maybe SortSessionsBy -> Maybe SortOrder -> Maybe Int -> Maybe Int -> ClientM (ListResponse Session)
 sessionClient :: SessionId -> SessionClientM
 
 
