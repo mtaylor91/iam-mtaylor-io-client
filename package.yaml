@@ -1,6 +1,6 @@
-name:                iam-mtaylor-io-client
+name:                iam-client-haskell
 version:             0.1.0.0
-github:              "mtaylor91/iam-mtaylor-io-client"
+github:              "mtaylorio/iam-client-haskell"
 license:             BSD-3-Clause
 author:              "Mike Taylor"
 maintainer:          "mike.charles.taylor@gmail.com"
@@ -61,7 +61,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - iam-mtaylor-io-client
+    - iam-client-haskell
 
 tests:
   iam-mtaylor-io-client-test:
@@ -72,4 +72,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - iam-mtaylor-io-client
+    - iam-client-haskell
