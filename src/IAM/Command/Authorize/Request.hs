@@ -7,15 +7,11 @@ module IAM.Command.Authorize.Request
 import Data.Text
 import Data.Text.Encoding
 import Options.Applicative
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
-import Servant.Client
 import Text.Email.Validate
 import Text.Read
 
 import IAM.Authentication
 import IAM.Authorization
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.UserIdentifier
 import qualified IAM.Client
@@ -32,9 +28,8 @@ data AuthorizeRequestCommand = AuthorizeRequestCommand
 
 authorizeRequest :: AuthorizeRequestCommand -> IO ()
 authorizeRequest cmd = do
-  url <- serverUrl
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
+  iamConfig <- IAM.Client.iamClientConfigEnv
+  iamClient <- IAM.Client.newIAMClient iamConfig
 
   reqUser <- case readMaybe (unpack $ authorizeUser cmd) of
     Just uuid ->
@@ -55,7 +50,7 @@ authorizeRequest cmd = do
         }
 
   let authorizeClient = IAM.Client.authorizeClient req
-  r <- runClientM authorizeClient $ mkClientEnv mgr url
+  r <- IAM.Client.iamRequest iamClient authorizeClient
   case r of
     Right (AuthorizationResponse decision) ->
       print decision

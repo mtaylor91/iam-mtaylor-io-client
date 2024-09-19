@@ -5,12 +5,8 @@ module IAM.Command.Logout
   ) where
 
 import Options.Applicative
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
-import Servant.Client
 
 import IAM.Client
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.Config
 
@@ -20,14 +16,13 @@ data LogoutOptions = LogoutOptions deriving (Eq, Show)
 
 logout :: LogoutOptions -> IO ()
 logout LogoutOptions = do
-  url <- serverUrl
+  iamConfig <- iamClientConfigEnv
+  iamClient <- newIAMClient iamConfig
   sid <- configSessionId
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
   let sessionsClient = mkCallerSessionsClient
   let sessionClient' = userSessionClient sessionsClient sid
   let deleteSession' = deleteUserSession sessionClient'
-  r <- runClientM deleteSession' $ mkClientEnv mgr url
+  r <- iamRequest iamClient deleteSession'
   case r of
     Left err -> handleClientError err
     Right _ -> do

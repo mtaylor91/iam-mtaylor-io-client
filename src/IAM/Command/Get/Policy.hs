@@ -6,14 +6,10 @@ import Data.Aeson
 import Data.ByteString.Lazy (toStrict)
 import Data.Text.Encoding
 import Data.UUID
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
-import Servant.Client
 import Text.Read
 import qualified Data.Text as T
 
 import IAM.Client
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.Policy
 
@@ -34,11 +30,10 @@ getPolicyByName = getPolicyByIdentifier . PolicyName
 
 getPolicyByIdentifier :: PolicyIdentifier -> IO ()
 getPolicyByIdentifier identifier = do
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
-  url <- serverUrl
+  iamConfig <- iamClientConfigEnv
+  iamClient <- newIAMClient iamConfig
   let policyClient = mkPolicyClient identifier
-  result <- runClientM (IAM.Client.getPolicy policyClient) $ mkClientEnv mgr url
+  result <- iamRequest iamClient $ IAM.Client.getPolicy policyClient
   case result of
     Right policy' ->
       putStrLn $ T.unpack (decodeUtf8 $ toStrict $ encode $ toJSON policy')

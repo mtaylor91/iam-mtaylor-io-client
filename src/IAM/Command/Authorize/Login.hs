@@ -7,14 +7,9 @@ module IAM.Command.Authorize.Login
 import Data.Text
 import Data.UUID
 import Options.Applicative
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
-import Servant.Client
 import System.Exit
 
 import IAM.Client
-import IAM.Client.Auth
-import IAM.Client.Util
 import IAM.Login
 
 
@@ -34,10 +29,9 @@ authorizeLogin cmd = case fromText $ authorizeLoginId cmd of
 authorizeLoginById :: LoginRequestId -> IO ()
 authorizeLoginById loginId = do
   let lrc = mkCallerLoginRequestClient loginId
-  url <- serverUrl
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
-  res <- runClientM (grantLoginRequest lrc) $ mkClientEnv mgr url
+  iamConfig <- iamClientConfigEnv
+  iamClient <- newIAMClient iamConfig
+  res <- iamRequest iamClient $ grantLoginRequest lrc
   case res of
     Left err -> do
       putStrLn $ "Error: " ++ show err

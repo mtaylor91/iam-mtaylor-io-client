@@ -6,13 +6,9 @@ module IAM.Command.Delete.Group
 
 import Data.Text
 import Data.UUID
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
 import Options.Applicative
-import Servant.Client
 import Text.Read
 
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.GroupIdentifier (GroupId(..), GroupIdentifier(..))
 import qualified IAM.Client
@@ -40,12 +36,11 @@ deleteGroupByUUID = deleteGroupById . GroupId . GroupUUID
 
 deleteGroupById :: GroupIdentifier -> IO ()
 deleteGroupById gid = do
-  url <- serverUrl
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
+  iamConfig <- IAM.Client.iamClientConfigEnv
+  iamClient <- IAM.Client.newIAMClient iamConfig
 
   let grpClient = IAM.Client.mkGroupClient gid
-  res <- runClientM (IAM.Client.deleteGroup grpClient) $ mkClientEnv mgr url
+  res <- IAM.Client.iamRequest iamClient $ IAM.Client.deleteGroup grpClient
   case res of
     Left err -> handleClientError err
     Right _ -> return ()

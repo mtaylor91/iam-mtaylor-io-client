@@ -9,13 +9,9 @@ import Control.Exception
 import Data.Text as T
 import Data.UUID
 import Data.UUID.V4
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
 import Options.Applicative
-import Servant.Client
 import Text.Read
 
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.Policy
 import qualified IAM.Client
@@ -59,10 +55,9 @@ createPolicyWithUUID createPolicyInfo uuid =
 
 createPolicy' :: Policy -> IO ()
 createPolicy' policy = do
-  url <- serverUrl
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
-  result <- runClientM (IAM.Client.createPolicy policy) $ mkClientEnv mgr url
+  iamConfig <- IAM.Client.iamClientConfigEnv
+  iamClient <- IAM.Client.newIAMClient iamConfig
+  result <- IAM.Client.iamRequest iamClient $ IAM.Client.createPolicy policy
   case result of
     Right _ ->
       putStrLn $ unpack $ toText $ unPolicyId $ policyId policy

@@ -7,14 +7,10 @@ module IAM.Command.Delete.Session
 import Data.Text
 import Data.Text.Encoding
 import Options.Applicative
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
-import Servant.Client
 import System.Exit
 import Text.Email.Validate
 import Text.Read (readMaybe)
 
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.Config
 import IAM.Session
@@ -49,14 +45,13 @@ deleteSession (DeleteSession userIdentifier sessionIdentifier) =
 
 deleteSessionByUserIdentifier :: UserIdentifier -> SessionId -> IO ()
 deleteSessionByUserIdentifier uid sid = do
-  url <- serverUrl
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
+  iamConfig <- C.iamClientConfigEnv
+  iamClient <- C.newIAMClient iamConfig
   let userClient = C.mkUserClient uid
   let sessionsClient = C.userSessionsClient userClient
   let sessionClient' = C.userSessionClient sessionsClient sid
   let deleteSession' = C.deleteUserSession sessionClient'
-  r <- runClientM deleteSession' $ mkClientEnv mgr url
+  r <- C.iamRequest iamClient deleteSession'
   case r of
     Left err -> handleClientError err
     Right _ -> do

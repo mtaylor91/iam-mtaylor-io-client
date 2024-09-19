@@ -6,13 +6,9 @@ module IAM.Command.Delete.User
 
 import Data.Text
 import Data.UUID
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
 import Options.Applicative
-import Servant.Client
 import Text.Read
 
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.UserIdentifier
 import qualified IAM.Client
@@ -41,12 +37,11 @@ deleteUserByUUID uuid =
 
 deleteUserById :: UserIdentifier -> IO ()
 deleteUserById uid = do
-  url <- serverUrl
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
+  iamConfig <- IAM.Client.iamClientConfigEnv
+  iamClient <- IAM.Client.newIAMClient iamConfig
 
   let userClient = IAM.Client.mkUserClient uid
-  res <- runClientM (IAM.Client.deleteUser userClient) $ mkClientEnv mgr url
+  res <- IAM.Client.iamRequest iamClient $ IAM.Client.deleteUser userClient
   case res of
     Left err -> handleClientError err
     Right _ -> return ()

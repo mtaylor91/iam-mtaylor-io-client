@@ -12,14 +12,10 @@ import Data.Text as T
 import Data.Text.Encoding
 import Data.UUID
 import Data.UUID.V4
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
 import Options.Applicative
-import Servant.Client
 import Text.Email.Validate
 import Text.Read
 
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.Config
 import IAM.GroupIdentifier
@@ -86,9 +82,8 @@ createUserByUUID createUserInfo uuid maybeName maybeEmail = do
 
 createUserById' :: CreateUser -> UserId -> Maybe Text -> Maybe Text -> Text -> IO ()
 createUserById' createUserInfo uid maybeName maybeEmail pk = do
-  url <- serverUrl
-  auth <- clientAuthInfo
-  mgr <- newManager $ tlsManagerSettings { managerModifyRequest = clientAuth auth }
+  iamConfig <- IAM.Client.iamClientConfigEnv
+  iamClient <- IAM.Client.newIAMClient iamConfig
   case decodeBase64 (encodeUtf8 pk) of
     Left _ ->
       putStrLn "Invalid public key: base64 decoding failed"
@@ -98,7 +93,7 @@ createUserById' createUserInfo uid maybeName maybeEmail pk = do
       let ps = pid <$> createUserPolicies createUserInfo
       let user = User uid maybeName maybeEmail gs ps [upk']
       let clientCommand = IAM.Client.createUser user
-      result <- runClientM clientCommand $ mkClientEnv mgr url
+      result <- IAM.Client.iamRequest iamClient clientCommand
       case result of
         Left err -> handleClientError err
         Right _ -> return ()

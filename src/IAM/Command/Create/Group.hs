@@ -8,14 +8,10 @@ import Data.Text
 import Data.Text.Encoding
 import Data.UUID
 import Data.UUID.V4
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
 import Options.Applicative
-import Servant.Client
 import Text.Email.Validate
 import Text.Read
 
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.Group
 import IAM.GroupIdentifier
@@ -59,9 +55,8 @@ createGroupById :: CreateGroup -> GroupIdentifier -> IO ()
 createGroupById createGroupInfo gident = do
   policies <- mapM translatePolicyId $ createGroupPolicies createGroupInfo
   users <- mapM translateUserId $ createGroupUsers createGroupInfo
-  url <- serverUrl
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
+  iamConfig <- IAM.Client.iamClientConfigEnv
+  iamClient <- IAM.Client.newIAMClient iamConfig
 
   gid <- case unGroupIdentifier gident of
     Right (GroupUUID uuid) -> return $ GroupUUID uuid
@@ -69,7 +64,7 @@ createGroupById createGroupInfo gident = do
 
   let maybeName = unGroupIdentifierName gident
   let grp = Group gid maybeName users policies
-  res <- runClientM (IAM.Client.createGroup grp) $ mkClientEnv mgr url
+  res <- IAM.Client.iamRequest iamClient $ IAM.Client.createGroup grp
   case res of
     Left err -> handleClientError err
     Right _ -> return ()

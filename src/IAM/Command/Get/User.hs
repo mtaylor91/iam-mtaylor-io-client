@@ -7,14 +7,10 @@ import Data.ByteString.Lazy (toStrict)
 import Data.Text (Text, unpack)
 import Data.Text.Encoding
 import Data.UUID
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
-import Servant.Client
 import Text.Read
 import qualified Data.Text as T
 
 import IAM.Client
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.UserIdentifier (UserIdentifier(..), UserId(..))
 
@@ -32,10 +28,9 @@ getSpecifiedUser uid =
 
 getCurrentUser :: IO ()
 getCurrentUser = do
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
-  url <- serverUrl
-  result <- runClientM IAM.Client.getCaller $ mkClientEnv mgr url
+  iamConfig <- iamClientConfigEnv
+  iamClient <- newIAMClient iamConfig
+  result <- iamRequest iamClient IAM.Client.getCaller
   case result of
     Right user ->
       putStrLn $ T.unpack (decodeUtf8 $ toStrict $ encode $ toJSON user)
@@ -53,11 +48,10 @@ getUserByEmail email = getUserById $ UserIdentifier Nothing Nothing (Just email)
 
 getUserById :: UserIdentifier -> IO ()
 getUserById uid = do
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
-  url <- serverUrl
+  iamConfig <- iamClientConfigEnv
+  iamClient <- newIAMClient iamConfig
   let userClient = mkUserClient uid
-  result <- runClientM (IAM.Client.getUser userClient) $ mkClientEnv mgr url
+  result <- iamRequest iamClient $ IAM.Client.getUser userClient
   case result of
     Right user ->
       putStrLn $ T.unpack (decodeUtf8 $ toStrict $ encode $ toJSON user)

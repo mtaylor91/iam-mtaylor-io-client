@@ -7,13 +7,9 @@ import Data.ByteString.Lazy (toStrict)
 import Data.Text as T
 import Data.Text.Encoding
 import Data.UUID
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
-import Servant.Client
 import Text.Read
 
 import IAM.Client
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.GroupIdentifier
 
@@ -37,11 +33,10 @@ getGroupByName = getGroupById . GroupName
 
 getGroupById :: GroupIdentifier -> IO ()
 getGroupById gid = do
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
-  url <- serverUrl
+  iamConfig <- iamClientConfigEnv
+  iamClient <- newIAMClient iamConfig
   let groupClient = mkGroupClient gid
-  result <- runClientM (IAM.Client.getGroup groupClient) $ mkClientEnv mgr url
+  result <- iamRequest iamClient $ IAM.Client.getGroup groupClient
   case result of
     Right group' ->
       putStrLn $ T.unpack (decodeUtf8 $ toStrict $ encode $ toJSON group')

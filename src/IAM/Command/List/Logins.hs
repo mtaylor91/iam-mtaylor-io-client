@@ -9,12 +9,8 @@ import Data.Aeson (encode, toJSON)
 import Data.ByteString.Lazy (toStrict)
 import Data.Text as T
 import Data.Text.Encoding
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
-import Servant.Client
 
 import IAM.Client
-import IAM.Client.Auth
 import IAM.Client.Util
 
 
@@ -28,11 +24,10 @@ listLogins :: ListLoginsOptions -> IO ()
 listLogins opts = do
   let offset = listLoginsOffset opts
   let limit = listLoginsLimit opts
-  url <- serverUrl
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
+  iamConfig <- iamClientConfigEnv
+  iamClient <- newIAMClient iamConfig
   let clientReq = listCallerLoginRequests offset limit
-  result <- runClientM clientReq $ mkClientEnv mgr url
+  result <- iamRequest iamClient clientReq
   case result of
     Left err ->
       handleClientError err

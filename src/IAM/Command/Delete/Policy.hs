@@ -6,13 +6,9 @@ module IAM.Command.Delete.Policy
 
 import Data.Text
 import Data.UUID
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
 import Options.Applicative
-import Servant.Client
 import Text.Read
 
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.Policy
 import qualified IAM.Client
@@ -40,12 +36,11 @@ deletePolicyByUUID polId = deletePolicyByIdentifier $ PolicyId $ PolicyUUID polI
 
 deletePolicyByIdentifier :: PolicyIdentifier -> IO ()
 deletePolicyByIdentifier polId = do
-  url <- serverUrl
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
+  iamConfig <- IAM.Client.iamClientConfigEnv
+  iamClient <- IAM.Client.newIAMClient iamConfig
 
   let polClient = IAM.Client.mkPolicyClient polId
-  res <- runClientM (IAM.Client.deletePolicy polClient) $ mkClientEnv mgr url
+  res <- IAM.Client.iamRequest iamClient $ IAM.Client.deletePolicy polClient
   case res of
     Left err -> handleClientError err
     Right _ -> return ()

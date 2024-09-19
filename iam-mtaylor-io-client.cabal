@@ -26,6 +26,7 @@ source-repository head
 library
   exposed-modules:
       IAM.Client
+      IAM.Client.API
       IAM.Client.Auth
       IAM.Client.Util
       IAM.Command

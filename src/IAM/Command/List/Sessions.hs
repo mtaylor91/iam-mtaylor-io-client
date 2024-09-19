@@ -9,13 +9,10 @@ import Data.ByteString.Lazy (toStrict)
 import Data.Text as T
 import Data.Text.Encoding
 import Data.UUID
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
 import Options.Applicative
 import Servant.Client
 import Text.Read
 
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.ListResponse
 import IAM.UserIdentifier (UserIdentifier(..), UserId(..))
@@ -87,10 +84,9 @@ runWithClient :: (Maybe Int -> Maybe Int -> ClientM (ListResponse Session)) ->
 runWithClient c opts = do
   let maybeOffset = listSessionsOffset opts
   let maybeLimit = listSessionsLimit opts
-  url <- serverUrl
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
-  r <- runClientM (c maybeOffset maybeLimit) $ mkClientEnv mgr url
+  iamConfig <- IAM.Client.iamClientConfigEnv
+  iamClient <- IAM.Client.newIAMClient iamConfig
+  r <- IAM.Client.iamRequest iamClient (c maybeOffset maybeLimit)
   case r of
     Right sessions ->
       putStrLn $ T.unpack (decodeUtf8 $ toStrict $ encode $ toJSON sessions)

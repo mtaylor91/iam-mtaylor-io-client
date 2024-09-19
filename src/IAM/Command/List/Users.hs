@@ -8,12 +8,8 @@ import Data.Aeson (encode, toJSON)
 import Data.ByteString.Lazy (toStrict)
 import Data.Text as T
 import Data.Text.Encoding
-import Network.HTTP.Client
-import Network.HTTP.Client.TLS
 import Options.Applicative
-import Servant.Client
 
-import IAM.Client.Auth
 import IAM.Client.Util
 import IAM.Sort
 import qualified IAM.Client
@@ -47,11 +43,10 @@ listUsers' opts maybeSort maybeOrder = do
   let mSearch = listUsersSearch opts
   let mOffset = listUsersOffset opts
   let mLimit = listUsersLimit opts
-  url <- serverUrl
-  auth <- clientAuthInfo
-  mgr <- newManager tlsManagerSettings { managerModifyRequest = clientAuth auth }
+  iamConfig <- IAM.Client.iamClientConfigEnv
+  iamClient <- IAM.Client.newIAMClient iamConfig
   let clientOp = IAM.Client.listUsers mSearch maybeSort maybeOrder mOffset mLimit
-  r <- runClientM clientOp $ mkClientEnv mgr url
+  r <- IAM.Client.iamRequest iamClient clientOp
   case r of
     Right users ->
       putStrLn $ T.unpack (decodeUtf8 $ toStrict $ encode $ toJSON users)
