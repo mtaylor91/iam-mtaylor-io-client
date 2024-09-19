@@ -1,4 +1,4 @@
-name:                iam-client-haskell
+name:                mtaylor-io-iam-client
 version:             0.1.0.0
 github:              "mtaylorio/iam-client-haskell"
 license:             BSD-3-Clause
@@ -30,7 +30,7 @@ dependencies:
 - http-client
 - http-client-tls
 - http-types
-- iam-mtaylor-io-core
+- mtaylor-io-iam-core
 - optparse-applicative
 - servant-client
 - servant-server
@@ -61,7 +61,7 @@ executables:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - iam-client-haskell
+    - mtaylor-io-iam-client
 
 tests:
   iam-mtaylor-io-client-test:
@@ -72,4 +72,4 @@ tests:
     - -rtsopts
     - -with-rtsopts=-N
     dependencies:
-    - iam-client-haskell
+    - mtaylor-io-iam-client

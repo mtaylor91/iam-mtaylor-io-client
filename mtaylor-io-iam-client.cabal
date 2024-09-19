@@ -4,7 +4,7 @@ cabal-version: 2.2
 --
 -- see: https://github.com/sol/hpack
 
-name:           iam-client-haskell
+name:           mtaylor-io-iam-client
 version:        0.1.0.0
 description:    Please see the README on GitHub at <https://github.com/mtaylor91/iam-mtaylor-io-client#readme>
 homepage:       https://github.com/mtaylorio/iam-client-haskell#readme
@@ -56,9 +56,9 @@ library
       IAM.Command.Login
       IAM.Command.Logout
   other-modules:
-      Paths_iam_client_haskell
+      Paths_mtaylor_io_iam_client
   autogen-modules:
-      Paths_iam_client_haskell
+      Paths_mtaylor_io_iam_client
   hs-source-dirs:
       src
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints
@@ -73,7 +73,7 @@ library
     , http-client
     , http-client-tls
     , http-types
-    , iam-mtaylor-io-core
+    , mtaylor-io-iam-core
     , optparse-applicative
     , servant-client
     , servant-server
@@ -85,9 +85,9 @@ library
 executable iam-mtaylor-io-client
   main-is: Main.hs
   other-modules:
-      Paths_iam_client_haskell
+      Paths_mtaylor_io_iam_client
   autogen-modules:
-      Paths_iam_client_haskell
+      Paths_mtaylor_io_iam_client
   hs-source-dirs:
       app
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
@@ -102,8 +102,8 @@ executable iam-mtaylor-io-client
     , http-client
     , http-client-tls
     , http-types
-    , iam-client-haskell
-    , iam-mtaylor-io-core
+    , mtaylor-io-iam-client
+    , mtaylor-io-iam-core
     , optparse-applicative
     , servant-client
     , servant-server
@@ -116,9 +116,9 @@ test-suite iam-mtaylor-io-client-test
   type: exitcode-stdio-1.0
   main-is: Spec.hs
   other-modules:
-      Paths_iam_client_haskell
+      Paths_mtaylor_io_iam_client
   autogen-modules:
-      Paths_iam_client_haskell
+      Paths_mtaylor_io_iam_client
   hs-source-dirs:
       test
   ghc-options: -Wall -Wcompat -Widentities -Wincomplete-record-updates -Wincomplete-uni-patterns -Wmissing-export-lists -Wmissing-home-modules -Wpartial-fields -Wredundant-constraints -threaded -rtsopts -with-rtsopts=-N
@@ -133,8 +133,8 @@ test-suite iam-mtaylor-io-client-test
     , http-client
     , http-client-tls
     , http-types
-    , iam-client-haskell
-    , iam-mtaylor-io-core
+    , mtaylor-io-iam-client
+    , mtaylor-io-iam-core
     , optparse-applicative
     , servant-client
     , servant-server
