@@ -5,6 +5,7 @@ module IAM.Client
   , iamRequest
   , setSessionToken
   , IAMClient(..)
+  , IAMClientConfig(..)
   , module IAM.Client.API
   ) where
 
