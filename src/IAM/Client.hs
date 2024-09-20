@@ -20,6 +20,7 @@ import Servant.Client
 import IAM.Client.API
 import IAM.Client.Auth
 import IAM.Config
+import IAM.UserIdentifier
 
 
 data IAMClient = IAMClient
@@ -32,7 +33,7 @@ data IAMClient = IAMClient
 
 data IAMClientConfig = IAMClientConfig
   { iamClientConfigBaseURL :: String
-  , iamClientConfigUserIdentifier :: String
+  , iamClientConfigUserIdentifier :: UserIdentifier
   , iamClientConfigSecretKey :: SecretKey
   , iamClientConfigSessionToken :: Maybe String
   }
@@ -70,13 +71,13 @@ requestAuth config sessionTokenVar req = do
     Nothing -> do
       requestId <- nextRandom
       maybeSessionToken <- readTVarIO sessionTokenVar
-      let userId' = pack $ iamClientConfigUserIdentifier config
+      let userId = userIdentifierToText $ iamClientConfigUserIdentifier config
           publicKey = encodePublicKey $ iamClientConfigSecretKey config
           authorization = authHeader reqStringToSign $ iamClientConfigSecretKey config
           reqStringToSign = authStringToSign req requestId maybeSessionToken
       return $ req
         { requestHeaders = requestHeaders req ++
-          authReqHeaders authorization userId' publicKey requestId maybeSessionToken
+          authReqHeaders authorization userId publicKey requestId maybeSessionToken
         }
 
 
